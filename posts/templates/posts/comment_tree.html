@@ -1,0 +1,30 @@
+{% load humanize %}
+<li class="comments comments subtree">
+  <input id="comment_folder_{{ comment.id }}" class="comment_folder_button" type="checkbox">
+  <div id="{{ comment.id }}" data-shortid="{{ comment.id }}" class="comment">
+    <label for="comment_folder_{{ comment.id }}" class="comment_folder"></label>
+    <div class="voters">
+      <a class="upvoter" href="/login"></a>
+      <div class="score">&nbsp;</div>
+      <span class="downvoter downvoter_stub"></span>
+    </div>
+    <div class="comment_parent_tree_line"></div>
+    <div class="details">
+      <div class="byline">
+        <a href="{% url 'posts:user' comment.user.username %}">{{ comment.user }}</a>
+        | {{ comment.created_on|naturaltime }}
+        | <a href="{{ request.path|urlencode }}#{{ comment.id }}">link</a>
+      </div>
+      <div class="comment_text">
+        {{ comment.content }}
+      </div>
+    </div>
+
+  </div>
+  <ol class="comments">
+  {% for reply in comment.replies.all %}
+    {% include "posts/comment_tree.html" with comment=reply level=level|add:1 %}
+  {% endfor %}
+  </ol>
+</li>
+

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div class="box wide">
+  <div class="legend">
+    <span>
+      {{ user.username }}
+    </span>
+  </div>
+  <label class="required">Active:</label>
+  <span class="d">{{ user.is_active }}</span>
+  <br>
+  <label class="required">Karma:</label>
+  <span class="d">{{ user.karma }}</span>
+  <br>
+  <label class="required">Joined:</label>
+  <span class="d">{{ user.date_joined }}</span>
+  <br>
+  <label class="required">Posts:</label>
+  <span class="d">{{ user.posts.count }}</span>
+  <br>
+  <label class="required">Comments:</label>
+  <span class="d">{{ user.comments.count|default:"0" }}</span>
+</div>
+<hr>
+{% include "posts/post_list.html" %}
+{% endblock content %}

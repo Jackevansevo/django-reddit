@@ -1,0 +1,37 @@
+{% load humanize %}
+<div class="post_liner h-entry">
+  <div class="voters">
+      {% if post.upvoted %}
+        <a class="upvoter" href=""></a>
+      {% else %}
+        <a class="upvoter" href="{% url 'posts:upvote_post' post.id %}?next={{ request.path|urlencode }}"></a>
+      {% endif %}
+
+      <div class="score">{{ post.score }}</div>
+
+      {% if post.downvoted %}
+        <a class="downvoter" href=""></a>
+      {% else %}
+        <a class="downvoter" href="{% url 'posts:downvote_post' post.id %}?next={{ request.path|urlencode }}"></a>
+      {% endif %}
+  </div>
+  <div class="details">
+    <span class="link">
+      <a href="{{ post.get_absolute_url }}">{{ post.title|truncatechars:100 }}</a>
+    </span>
+    <div class="byline">
+      posted by <a href="{% url 'posts:user' post.user %}">{{ post.user }}</a>
+      to <a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a> {{ post.created_on|naturaltime }}
+      | <a href="{{ post.get_absolute_url }}">{{ post.total_comments }} Comment{{ post.total_comments|pluralize }}</a>
+
+      {% if request.user.is_authenticated %}
+        {% if post.has_saved %}
+          |<a class="text-danger" href="{% url 'posts:unsave_post' post.id %}?next={{ request.path|urlencode }}"> Unsave</a>
+        {% else %}
+          | <a class="text-success" href="{% url 'posts:save_post' post.id %}?next={{ request.path|urlencode }}"> Save</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+  <a href="{{ post.get_absolute_url }}" class="mobile_comments " style="display: none;"><span>{{ post.total_comments }}</span></a>
+</div>

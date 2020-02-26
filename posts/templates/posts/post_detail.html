@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+  <ol class="posts list">
+      <li class="post">
+        {% include "posts/post.html" %}
+      </li>
+  </ol>
+
+  {% if post.body %}
+  <div class="content">
+    {{ post.body }}
+  </div>
+  {% endif %}
+  {% if post.photo %}
+  <a href="{{ MEDIA_PREFIX }}{{ post.photo }}">
+    <img src="{{ MEDIA_PREFIX }}{{ post.photo }}">
+  </a>
+  {% endif %}
+
+  <div style="padding-bottom: 0.5rem;">all {{ post.comments.count }} Comments</div>
+
+  {% if user.is_authenticated %}
+    <form action="{% url 'posts:comment' post.id %}" method="post">
+      {% csrf_token %}
+        <textarea class="textarea" name="content" placeholder="Add a comment..."></textarea>
+        <div>
+          <button class="button" type="submit">Post comment</button>
+        </div>
+    </form>
+    {% else %}
+    <div class="box"><a href="{% url 'login' %}">Login</a> to leave a comment</div>
+    {% endif %}
+
+  <ol class="comments comments1">
+    {% for comment in post.comments.all %}
+    {% if not comment.reply %}
+      {% include "posts/comment_tree.html" with level=0 %}
+    {% endif %}
+    {% endfor %}
+  </ol>
+
+{% endblock content %}

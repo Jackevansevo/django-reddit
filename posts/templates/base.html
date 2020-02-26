@@ -1,0 +1,47 @@
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+{% get_media_prefix as MEDIA_PREFIX %}
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/posts.css' %}">
+  <title>Jeddit - {% block title %}{% endblock title %}</title>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <div id="headerleft">
+          <span class="headerlinks">
+            <a href="/" class="">Home</a>
+          </span>
+          <span class="headerlinks">
+            <a href="{% url 'posts:category_list' %}" class="">Categories</a>
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'posts:user_feed' %}" class="">Feed</a>
+              <a href="{% url 'posts:post_create' %}" class="">Submit</a>
+            {% endif %}
+          </span>
+        </div>
+        <div id="headerright">
+          <span class="headerlinks">
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'posts:user' request.user.username %}">{{ request.user.username }}</a>
+              <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+              <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+          </span>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div id="inside">
+        {% block content %}
+        {% endblock %}
+      </div>
+      <footer>
+        {% block footer %}
+        {% endblock %}
+      </footer>
+    </div>
+  </body>
+</html>
