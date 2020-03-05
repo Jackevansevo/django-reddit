@@ -4,27 +4,25 @@
   <div id="{{ comment.id }}" data-shortid="{{ comment.id }}" class="comment">
     <label for="comment_folder_{{ comment.id }}" class="comment_folder"></label>
     <div class="voters">
-      <a class="upvoter" href="/login"></a>
-      <div class="score">&nbsp;</div>
-      <span class="downvoter downvoter_stub"></span>
+        <a class="upvoter" href="{% url 'posts:upvote_comment' comment.id %}?next={{ request.path|urlencode }}"></a>
+        <div class="score">{{ comment.score }}</div>
+        <a class="downvoter" href="{% url 'posts:downvote_comment' comment.id %}?next={{ request.path|urlencode }}"></a>
     </div>
     <div class="comment_parent_tree_line"></div>
     <div class="details">
       <div class="byline">
-        <a href="{% url 'posts:user' comment.user.username %}">{{ comment.user }}</a>
+        <a href="{% url 'posts:user_detail' comment.user.username %}">{{ comment.user }}</a>
         | {{ comment.created_on|naturaltime }}
         | <a href="{{ request.path|urlencode }}#{{ comment.id }}">link</a>
       </div>
       <div class="comment_text">
-        {{ comment.content }}
+        Score: {{ comment.score }} - {{ comment.content }}
       </div>
     </div>
-
   </div>
   <ol class="comments">
   {% for reply in comment.replies.all %}
-    {% include "posts/comment_tree.html" with comment=reply level=level|add:1 %}
+    {% include "posts/comment_tree.html" with comment=reply %}
   {% endfor %}
   </ol>
 </li>
-

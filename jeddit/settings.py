@@ -28,7 +28,7 @@ SECRET_KEY = "m!)gy6q$o^c34r23bgup#iinfq-gdgdm@b8!1s1n2k+u_#d9xd"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = ["127.0.0.1"]
 
@@ -43,8 +43,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
-    "debug_toolbar",
 ]
+
+if DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -54,8 +56,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
+
+if DEBUG:
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+else:
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "jeddit.urls"
 

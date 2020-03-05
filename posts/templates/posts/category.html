@@ -10,6 +10,9 @@
     <label class="required">Posts:</label>
     <span class="d">{{ category.posts.count }}</span>
     <br>
+    <label class="required">Created:</label>
+    <span class="d">{{ category.created_on|date }}</span>
+    <br>
     <label class="required">Subscribers:</label>
     <span class="d">{{ category.subscribers.count }}</span>
     {% if request.user.is_authenticated %}

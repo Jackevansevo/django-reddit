@@ -16,11 +16,19 @@ urlpatterns = [
     path("r/<str:category_slug>/subscribe", views.subscribe, name="subscribe"),
     path("r/<str:category_slug>/unsubscribe", views.unsubscribe, name="unsubscribe"),
     path("r/random", views.random, name="random"),
-    path("u/<str:username>/", views.user, name="user"),
+    path("u/<str:username>/", views.user_detail, name="user_detail"),
     path("<str:post_id>/save", views.save_post, name="save_post"),
     path("<str:post_id>/unsave", views.unsave_post, name="unsave_post"),
     path("<str:post_id>/upvote", views.upvote_post, name="upvote_post"),
     path("<str:post_id>/downvote", views.downvote_post, name="downvote_post"),
+    path(
+        "comment/<str:comment_id>/upvote", views.upvote_comment, name="upvote_comment"
+    ),
+    path(
+        "comment/<str:comment_id>/downvote",
+        views.downvote_comment,
+        name="downvote_comment",
+    ),
     path("<str:post_id>/comment", views.comment, name="comment"),
     path("<str:post_id>/<str:post_slug>/", views.post_detail, name="post_detail"),
 ]

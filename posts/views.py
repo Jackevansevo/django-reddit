@@ -123,9 +123,29 @@ def index(request):
     return render(request, "posts/index.html", {"page_obj": page_obj},)
 
 
-def user(request, username):
+def user_detail(request, username):
 
-    posts_query = Post.ranked.order_by("-score", "created_on")
+    posts_query = Post.ranked.select_related("category").order_by(
+        "-score", "created_on"
+    )
+
+    if request.user.is_authenticated:
+        # Filter down all the votes for a given user
+        user_votes = Vote.objects.filter(user=request.user, object_id=OuterRef("pk"))
+        user_favs = Favourite.objects.filter(
+            user=request.user, object_id=OuterRef("pk")
+        )
+        posts_query = posts_query.annotate(
+            has_saved=Exists(user_favs, distinct=True),
+            upvoted=Exists(
+                user_votes.filter(object_id=OuterRef("pk"), choice=Vote.Choice.UP),
+                distinct=True,
+            ),
+            downvoted=Exists(
+                user_votes.filter(object_id=OuterRef("pk"), choice=Vote.Choice.DOWN),
+                distinct=True,
+            ),
+        )
 
     # Pre-fetch a user and all their corresponding posts
     user_query = User.objects.prefetch_related(Prefetch("posts", queryset=posts_query))
@@ -139,19 +159,7 @@ def user(request, username):
 
     user = get_object_or_404(user_query, username=username,)
 
-    posts = user.posts
-
-    if request.user.is_authenticated:
-        # Filter down all the votes for a given user
-        user_votes = Vote.objects.filter(user=request.user, object_id=OuterRef("pk"))
-        user_favs = Favourite.objects.filter(
-            user=request.user, object_id=OuterRef("pk")
-        )
-        posts = posts.annotate(
-            has_voted=Exists(user_votes), has_saved=Exists(user_favs)
-        )
-
-    paginator = Paginator(posts.all(), 50)
+    paginator = Paginator(user.posts.all(), 50)
     page_obj = paginator.get_page(request.GET.get("page"))
     return render(request, "posts/user.html", {"user": user, "page_obj": page_obj},)
 
@@ -198,7 +206,15 @@ def category_detail(request, category_slug):
             user=request.user, object_id=OuterRef("pk")
         )
         posts_query = posts_query.annotate(
-            has_voted=Exists(user_votes), has_saved=Exists(user_favs)
+            has_saved=Exists(user_favs, distinct=True),
+            upvoted=Exists(
+                user_votes.filter(object_id=OuterRef("pk"), choice=Vote.Choice.UP),
+                distinct=True,
+            ),
+            downvoted=Exists(
+                user_votes.filter(object_id=OuterRef("pk"), choice=Vote.Choice.DOWN),
+                distinct=True,
+            ),
         )
 
     category_query = category_query.prefetch_related(
@@ -268,15 +284,46 @@ def downvote_post(request, post_id):
     return resolve_vote(request, Vote.Choice.DOWN, post_id)
 
 
+def resolve_comment_vote(request, choice, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    Vote.objects.update_or_create(
+        object_id=comment_id,
+        user=request.user,
+        defaults={
+            "choice": choice,
+            "user": request.user,
+            "object_id": comment_id,
+            "content_object": comment,
+        },
+    )
+    return redirect(request.GET.get("next"))
+
+
+@login_required
+def upvote_comment(request, comment_id):
+    return resolve_comment_vote(request, Vote.Choice.UP, comment_id)
+
+
+@login_required
+def downvote_comment(request, comment_id):
+    return resolve_comment_vote(request, Vote.Choice.DOWN, comment_id)
+
+
 def post_detail(request, post_id, post_slug):
 
-    post_query = Post.ranked.prefetch_related("comments__replies")
+    post_query = Post.ranked.select_related("category", "user").prefetch_related(
+        Prefetch("comments", Comment.objects.select_related("reply"),)
+    )
 
     if request.user.is_authenticated:
         user_votes = Vote.objects.filter(user=request.user, object_id=post_id)
         user_favs = Favourite.objects.filter(user=request.user, object_id=post_id)
         post_query = post_query.annotate(
-            has_voted=Exists(user_votes), has_saved=Exists(user_favs)
+            has_saved=Exists(user_favs, distinct=True),
+            upvoted=Exists(user_votes.filter(choice=Vote.Choice.UP), distinct=True,),
+            downvoted=Exists(
+                user_votes.filter(choice=Vote.Choice.DOWN), distinct=True,
+            ),
         )
 
     post = get_object_or_404(post_query, id=post_id)

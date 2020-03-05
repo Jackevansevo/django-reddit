@@ -2,7 +2,7 @@
 <div class="post_liner h-entry">
   <div class="voters">
       {% if post.upvoted %}
-        <a class="upvoter" href=""></a>
+        <a class="upvoter upvoted" href="" style="border-bottom-color: #ac130d;"></a>
       {% else %}
         <a class="upvoter" href="{% url 'posts:upvote_post' post.id %}?next={{ request.path|urlencode }}"></a>
       {% endif %}
@@ -10,7 +10,7 @@
       <div class="score">{{ post.score }}</div>
 
       {% if post.downvoted %}
-        <a class="downvoter" href=""></a>
+        <a class="downvoter downvoted" href=""></a>
       {% else %}
         <a class="downvoter" href="{% url 'posts:downvote_post' post.id %}?next={{ request.path|urlencode }}"></a>
       {% endif %}
@@ -20,7 +20,7 @@
       <a href="{{ post.get_absolute_url }}">{{ post.title|truncatechars:100 }}</a>
     </span>
     <div class="byline">
-      posted by <a href="{% url 'posts:user' post.user %}">{{ post.user }}</a>
+      posted by <a href="{% url 'posts:user_detail' post.user %}">{{ post.user }}</a>
       to <a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a> {{ post.created_on|naturaltime }}
       | <a href="{{ post.get_absolute_url }}">{{ post.total_comments }} Comment{{ post.total_comments|pluralize }}</a>
 
