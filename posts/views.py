@@ -312,7 +312,9 @@ def downvote_comment(request, comment_id):
 def post_detail(request, post_id, post_slug):
 
     post_query = Post.ranked.select_related("category", "user").prefetch_related(
-        Prefetch("comments", Comment.objects.select_related("reply"),)
+        Prefetch(
+            "comments", Comment.objects.select_related("user").select_related("reply")
+        )
     )
 
     if request.user.is_authenticated:

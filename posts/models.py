@@ -23,22 +23,15 @@ class TimeStamp(models.Model):
 
 
 class Comment(TimeStamp):
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     content = models.TextField(max_length=2000)
-
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
-
     favourites = GenericRelation("Favourite", related_name="favourites")
-
     votes = GenericRelation("Vote", related_name="votes")
-
     # Top level comments are those that aren't replies to other comments
     reply = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True, blank=True, related_name="replies"
     )
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),

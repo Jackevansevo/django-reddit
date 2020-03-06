@@ -3,10 +3,13 @@
 Little hobby project I'm working on, just to see how quickly a very basic
 reddit clone would be to build in Django.
 
+![screenshot](screenshot.png)
+
 ### Features
 - Post voting
 - Post saving
 - Category subscription
+- Comment permalinks
 - Commenting
 
 ## [TODO]
@@ -14,7 +17,6 @@ reddit clone would be to build in Django.
 - [ ] Comment voting
 - [ ] Comment favourites
 - [ ] Custom post ordering (i.e. hot/new)
-- [ ] Comment permalinks
 - [ ] Category creation
 - [ ] Tests
 - [ ] Rest API (for external clients)

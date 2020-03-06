@@ -37,7 +37,7 @@
   <ol class="comments comments1">
     {% for comment in post.comments.all %}
     {% if not comment.reply %}
-      {% include "posts/comment_tree.html" with level=0 %}
+      {% include "posts/comment_tree.html" %}
     {% endif %}
     {% endfor %}
   </ol>
